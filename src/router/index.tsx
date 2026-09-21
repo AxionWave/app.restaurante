@@ -4,8 +4,10 @@ import InicioPage from '@/pages/Inicio';
 import CardapioPage from '@/pages/Cardapio';
 import PedidosPage from '@/pages/Pedidos';
 import MesasPage from '@/pages/Mesas';
+import EstoqueGeralPage from '@/pages/EstoqueGeral';
+import EntradaEstoquePage from '@/pages/EntradaEstoque';
 import ModuleProtectedRoute from './ModuleProtectedRoute';
-import { MODULOS_RAIZ } from '@/constants/moduleCodes';
+import { MODULOS_RAIZ, MODULO_ESTOQUE } from '@/constants/moduleCodes';
 
 const router = createBrowserRouter(
     [
@@ -40,6 +42,22 @@ const router = createBrowserRouter(
         element: (
             <ModuleProtectedRoute moduloCodigo="ORI0000003">
                 <MesasPage />
+            </ModuleProtectedRoute>
+        ),
+    },
+    {
+        path: '/estoque',
+        element: (
+            <ModuleProtectedRoute moduloCodigo={MODULO_ESTOQUE}>
+                <EstoqueGeralPage />
+            </ModuleProtectedRoute>
+        ),
+    },
+    {
+        path: '/estoque/entrada',
+        element: (
+            <ModuleProtectedRoute moduloCodigo={MODULO_ESTOQUE}>
+                <EntradaEstoquePage />
             </ModuleProtectedRoute>
         ),
     },

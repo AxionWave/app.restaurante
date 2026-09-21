@@ -2,7 +2,8 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { authService } from '@core/services';
 import { APP_CONFIG, urlInicioAsc } from '@core/config';
 import { buildSsoLaunchUrl } from '@core/auth/sso';
-import { MODULOS } from '@/constants/moduleCodes';
+import { MODULOS, MODULO_ESTOQUE } from '@/constants/moduleCodes';
+import SelecaoUnidade from '@/components/SelecaoUnidade';
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
     const navigate = useNavigate();
@@ -63,7 +64,14 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                     </button>
                 </div>
             </aside>
-            <main className="min-w-0 flex-1 p-6 md:p-8">{children}</main>
+            <main className="min-w-0 flex-1 p-6 md:p-8">
+                {authService.hasModulo(MODULO_ESTOQUE) && (
+                    <div className="mb-4 flex justify-end">
+                        <SelecaoUnidade />
+                    </div>
+                )}
+                {children}
+            </main>
         </div>
     );
 }
