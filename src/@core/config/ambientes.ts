@@ -42,7 +42,9 @@ export function resolveGatewayUrl(productAmbiente?: unknown): { url: string; amb
             : 'homolog'
         : null;
     const ambiente: Ambiente = product || gateway || app || fromUrl || 'local';
-    const url = GATEWAY_BY_AMBIENTE[ambiente];
+    // Explicit vence o mapa por ambiente — permite apontar para um Gateway em outra máquina/IP
+    // da rede local (ex.: acessar o front pelo celular via http://<ip-da-lan>:8080).
+    const url = explicit || GATEWAY_BY_AMBIENTE[ambiente];
 
     const oauth = parseAmbiente(import.meta.env.VITE_OAUTH_AMBIENTE);
     if (oauth && oauth !== ambiente) {

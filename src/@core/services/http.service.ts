@@ -1,6 +1,7 @@
 import axios, { AxiosHeaders, AxiosError, AxiosInstance, InternalAxiosRequestConfig } from 'axios';
 import { API_CONFIG, SECURITY_CONFIG } from '../config';
 import { AUTH_STORAGE_KEYS, clearAuthSessionStorage } from '../auth/auth.storage';
+import { getUnidadeAtivaId } from '@/state/unidadeAtiva.store';
 
 function applyGatewayHeaders(config: InternalAxiosRequestConfig): void {
     const secretToken = String(SECURITY_CONFIG.secretTokenQR || '').trim();
@@ -8,6 +9,16 @@ function applyGatewayHeaders(config: InternalAxiosRequestConfig): void {
     if (!config.headers) config.headers = new AxiosHeaders();
     if (typeof (config.headers as AxiosHeaders).set === 'function') {
         (config.headers as AxiosHeaders).set('X-Secret-Token', secretToken);
+    }
+}
+
+/** Anexa a unidade ativa (X-Unidade-Id) quando houver uma selecionada — usado pelas rotas de estoque. */
+function applyUnidadeAtiva(config: InternalAxiosRequestConfig): void {
+    const unidadeId = getUnidadeAtivaId();
+    if (!unidadeId) return;
+    if (!config.headers) config.headers = new AxiosHeaders();
+    if (typeof (config.headers as AxiosHeaders).set === 'function') {
+        (config.headers as AxiosHeaders).set('X-Unidade-Id', String(unidadeId));
     }
 }
 
@@ -34,6 +45,7 @@ httpClient.interceptors.request.use((config) => {
         config.headers.Authorization = `Bearer ${token}`;
     }
     applyGatewayHeaders(config);
+    applyUnidadeAtiva(config);
     return config;
 });
 

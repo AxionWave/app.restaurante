@@ -1,0 +1,15 @@
+# Frontend estático (nginx) do Orion. As variáveis VITE_* são "assadas" no build (Vite),
+# a partir do .env.local que já existe na pasta (é copiado pro contexto do build — confira
+# .dockerignore, que não exclui .env.local). O browser do usuário fala direto com o Gateway
+# publicado em localhost:8080, então este container não precisa estar na mesma rede docker.
+#
+# Uso: docker compose up -d --build
+services:
+  app-restaurante:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: app-restaurante
+    ports:
+      - "3001:80"
+    restart: on-failure:5
