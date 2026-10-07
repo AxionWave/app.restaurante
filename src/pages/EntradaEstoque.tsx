@@ -5,12 +5,14 @@ import BuscarProduto from '@/pages/estoque/BuscarProduto';
 import NovoProdutoForm from '@/pages/estoque/NovoProdutoForm';
 import { estoqueService, novaChaveIdempotencia } from '@/services/orion/estoque.service';
 import { getApiErrorMessage } from '@core/utils/apiError';
-import { extrairChaveAcesso } from '@/utils/chaveAcesso';
+import { chaveValida, extrairChaveAcesso } from '@/utils/chaveAcesso';
+import { extrairPesoVariavel } from '@/utils/pesoVariavel';
 import { getUnidadeAtivaId } from '@/state/unidadeAtiva.store';
 import type { EntradaDto, ItemDto, OrigemEntrada, ProdutoCore, TipoEntrada } from '@/services/orion/estoque.types';
 
-// @zxing/library é pesado (~500 kB) — só carrega quando o scanner é realmente aberto.
+// @zxing/library e tesseract.js são pesados — só carregam quando o scanner é realmente aberto.
 const LeitorCodigo = lazy(() => import('@/components/scanner/LeitorCodigo'));
+const LeitorPeso = lazy(() => import('@/components/scanner/LeitorPeso'));
 
 type Motivo = 'COMPRA' | 'MANUAL' | 'INVENTARIO' | 'DEVOLUCAO';
 
@@ -58,6 +60,16 @@ export default function EntradaEstoquePage() {
     const [itemCriandoProduto, setItemCriandoProduto] = useState<number | null>(null);
     const [criandoProdutoManual, setCriandoProdutoManual] = useState(false);
 
+    const [mostrarInputChave, setMostrarInputChave] = useState(false);
+    const [mostrarNotaFiscal, setMostrarNotaFiscal] = useState(false);
+    const [chaveDigitada, setChaveDigitada] = useState('');
+    const [arrastandoXml, setArrastandoXml] = useState(false);
+
+    // peso lido (código de balança ou foto da etiqueta) aguardando o produto ser escolhido/criado
+    const [pesoPendente, setPesoPendente] = useState<number | null>(null);
+    // null = fechado; '' = aplica ao próximo produto adicionado; outro valor = chave do item do carrinho sendo pesado
+    const [pesandoChave, setPesandoChave] = useState<string | null>(null);
+
     const [fornecedorNome, setFornecedorNome] = useState('');
     const [fornecedorCnpj, setFornecedorCnpj] = useState('');
     const [numeroNf, setNumeroNf] = useState('');
@@ -81,12 +93,30 @@ export default function EntradaEstoquePage() {
         setObservacao('');
         setErro(null);
         setAviso(null);
+        setPesoPendente(null);
+        setMostrarNotaFiscal(false);
+        setMostrarInputChave(false);
     }
 
     function adicionarAoCarrinho(p: ProdutoCore) {
-        setCarrinho((c) => [...c, carrinhoItemDeProduto(p)]);
+        const item = carrinhoItemDeProduto(p);
+        if (pesoPendente != null) {
+            item.quantidadeRecebida = String(pesoPendente);
+        }
+        setCarrinho((c) => [...c, item]);
         setCodigoBarrasPendente(null);
         setCriandoProdutoManual(false);
+        setPesoPendente(null);
+    }
+
+    function onDetectarPeso(pesoKg: number) {
+        if (pesandoChave) {
+            atualizarItem(pesandoChave, 'quantidadeRecebida', String(pesoKg));
+        } else {
+            setPesoPendente(pesoKg);
+            setAviso(`Peso lido: ${pesoKg} kg — agora escaneie ou busque o produto para aplicar.`);
+        }
+        setPesandoChave(null);
     }
 
     function atualizarItem(chave: string, campo: keyof CarrinhoItem, valor: string) {
@@ -100,6 +130,26 @@ export default function EntradaEstoquePage() {
     async function onDetectarProduto(valor: string) {
         setScanner(null);
         setErro(null);
+
+        const pesoVariavel = extrairPesoVariavel(valor);
+        if (pesoVariavel) {
+            try {
+                const encontrados = await estoqueService.buscarProdutos(pesoVariavel.plu);
+                if (encontrados.length === 1) {
+                    setPesoPendente(pesoVariavel.pesoKg);
+                    adicionarAoCarrinho(encontrados[0]);
+                } else {
+                    // produto novo ou ambíguo: abre o cadastro já com o peso lido pronto pra aplicar
+                    setPesoPendente(pesoVariavel.pesoKg);
+                    setCriandoProdutoManual(true);
+                    setAviso(`Peso lido: ${pesoVariavel.pesoKg} kg. Não achei um produto só com esse código — cadastre um novo.`);
+                }
+            } catch (e) {
+                setErro(getApiErrorMessage(e, 'Não foi possível buscar o produto pelo código de peso.'));
+            }
+            return;
+        }
+
         try {
             const produto = await estoqueService.resolverCodigoBarras(valor);
             adicionarAoCarrinho(produto);
@@ -112,14 +162,8 @@ export default function EntradaEstoquePage() {
         }
     }
 
-    async function onDetectarDanfe(valor: string) {
-        setScanner(null);
+    async function importarPelaChave(chave: string) {
         setErro(null);
-        const chave = extrairChaveAcesso(valor);
-        if (!chave) {
-            setErro('Não foi possível reconhecer uma chave de acesso válida nesse código.');
-            return;
-        }
         setEnviando(true);
         try {
             const resp = await estoqueService.importarPorChave(chave, unidadeAtivaId);
@@ -130,11 +174,24 @@ export default function EntradaEstoquePage() {
                 setEntrada(resp.entrada);
                 setAviso(resp.message);
             }
+            setChaveDigitada('');
+            setMostrarInputChave(false);
         } catch (e) {
             setErro(getApiErrorMessage(e, 'Não foi possível importar pela chave de acesso.'));
         } finally {
             setEnviando(false);
         }
+    }
+
+    async function onDetectarDanfe(valor: string) {
+        setScanner(null);
+        setErro(null);
+        const chave = extrairChaveAcesso(valor);
+        if (!chave) {
+            setErro('Não foi possível reconhecer uma chave de acesso válida nesse código.');
+            return;
+        }
+        await importarPelaChave(chave);
     }
 
     async function onImportarXml(file: File) {
@@ -296,50 +353,135 @@ export default function EntradaEstoquePage() {
             {!entrada && (
                 <>
                     <div className="mt-6 rounded-xl border border-slate-200 bg-white p-5">
-                        <p className="text-sm font-semibold text-slate-900">Adicionar itens</p>
+                        <p className="text-sm font-semibold text-slate-900">Adicionar produto</p>
+                        <p className="mt-0.5 text-xs text-slate-500">Busque pelo nome ou use a câmera — o jeito mais rápido.</p>
                         <div className="mt-3 flex flex-col gap-3 sm:flex-row">
                             <div className="flex-1">
                                 <BuscarProduto onEscolher={adicionarAoCarrinho} />
                             </div>
+                        </div>
+                        <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3">
                             <button
                                 type="button"
                                 onClick={() => setScanner('produto')}
-                                className="whitespace-nowrap rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white"
+                                className="flex items-center justify-center gap-2 rounded-lg bg-slate-900 px-4 py-3 text-sm font-medium text-white"
                             >
-                                📷 Escanear produto
+                                📷 Escanear código
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setPesandoChave('')}
+                                className="flex items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-medium text-accent ring-1 ring-accent/40"
+                            >
+                                ⚖️ Ler peso da etiqueta
                             </button>
                             <button
                                 type="button"
                                 onClick={() => setCriandoProdutoManual(true)}
-                                className="whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium text-accent ring-1 ring-accent/40"
+                                className="flex items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-medium text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50"
                             >
-                                + Novo produto
+                                ✍️ Cadastrar produto novo
                             </button>
-                            {motivo === 'COMPRA' && (
+                        </div>
+
+                        {pesoPendente != null && (
+                            <p className="mt-3 rounded-lg bg-sky-50 px-3 py-2 text-xs text-sky-800">
+                                ⚖️ Peso pronto: <strong>{pesoPendente} kg</strong> — escaneie ou busque o produto pra aplicar.
+                            </p>
+                        )}
+
+                        {motivo === 'COMPRA' && (
+                            <div className="mt-5 border-t border-slate-100 pt-4">
                                 <button
                                     type="button"
-                                    onClick={() => setScanner('danfe')}
-                                    className="whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium text-accent ring-1 ring-accent/40"
+                                    onClick={() => setMostrarNotaFiscal((v) => !v)}
+                                    className="text-xs font-medium text-slate-500 hover:text-slate-700 hover:underline"
                                 >
-                                    📷 Escanear DANFE
+                                    {mostrarNotaFiscal ? '▾' : '▸'} Já tem a nota fiscal? (XML, DANFE ou chave de acesso)
                                 </button>
-                            )}
-                            {motivo === 'COMPRA' && (
-                                <label className="cursor-pointer whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50">
-                                    Importar XML
-                                    <input
-                                        type="file"
-                                        accept=".xml,text/xml,application/xml"
-                                        className="hidden"
-                                        onChange={(e) => {
-                                            const file = e.target.files?.[0];
-                                            e.target.value = '';
-                                            if (file) void onImportarXml(file);
-                                        }}
-                                    />
-                                </label>
-                            )}
-                        </div>
+
+                                {mostrarNotaFiscal && (
+                                    <div className="mt-3 flex flex-col gap-3 sm:flex-row">
+                                        <button
+                                            type="button"
+                                            onClick={() => setScanner('danfe')}
+                                            className="whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium text-accent ring-1 ring-accent/40"
+                                        >
+                                            📷 Escanear DANFE
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setMostrarInputChave((v) => !v)}
+                                            className="whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50"
+                                        >
+                                            Digitar a chave
+                                        </button>
+                                        <label className="cursor-pointer whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50">
+                                            Importar XML
+                                            <input
+                                                type="file"
+                                                accept=".xml,text/xml,application/xml"
+                                                className="hidden"
+                                                onChange={(e) => {
+                                                    const file = e.target.files?.[0];
+                                                    e.target.value = '';
+                                                    if (file) void onImportarXml(file);
+                                                }}
+                                            />
+                                        </label>
+                                    </div>
+                                )}
+
+                                {mostrarInputChave && (
+                                    <div className="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-4">
+                                        <label className="text-xs font-medium text-slate-600">Chave de acesso da NF-e (44 dígitos)</label>
+                                        <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center">
+                                            {(() => {
+                                                const digitos = chaveDigitada.length;
+                                                const valida = digitos === 44 && chaveValida(chaveDigitada);
+                                                const corBorda =
+                                                    digitos === 0
+                                                        ? 'border-slate-200 focus:border-accent'
+                                                        : valida
+                                                          ? 'border-emerald-400'
+                                                          : digitos === 44
+                                                            ? 'border-red-300'
+                                                            : 'border-amber-300';
+                                                return (
+                                                    <>
+                                                        <div className="relative flex-1">
+                                                            <input
+                                                                value={chaveDigitada}
+                                                                onChange={(e) => setChaveDigitada(e.target.value.replace(/\D/g, '').slice(0, 44))}
+                                                                placeholder="0000 0000 0000 0000 0000 0000 0000 0000 0000 0000"
+                                                                className={`w-full rounded-lg border px-3 py-2 font-mono text-sm tracking-tight outline-none ${corBorda}`}
+                                                            />
+                                                            {digitos > 0 && (
+                                                                <span
+                                                                    className={`absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium ${
+                                                                        valida ? 'text-emerald-600' : digitos === 44 ? 'text-red-600' : 'text-amber-600'
+                                                                    }`}
+                                                                >
+                                                                    {valida ? '✓' : digitos === 44 ? 'chave inválida' : `${digitos}/44`}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                        <button
+                                                            type="button"
+                                                            disabled={!valida || enviando}
+                                                            onClick={() => void importarPelaChave(chaveDigitada)}
+                                                            className="whitespace-nowrap rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40"
+                                                        >
+                                                            Buscar
+                                                        </button>
+                                                    </>
+                                                );
+                                            })()}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
 
                         {codigoBarrasPendente && (
                             <div className="mt-4">
@@ -381,14 +523,24 @@ export default function EntradaEstoquePage() {
                                                 <p className="font-mono text-xs text-slate-400">{i.produtoCodigo}</p>
                                             </td>
                                             <td className="px-4 py-2">
-                                                <input
-                                                    type="number"
-                                                    min="0"
-                                                    step="any"
-                                                    value={i.quantidadeRecebida}
-                                                    onChange={(e) => atualizarItem(i.chave, 'quantidadeRecebida', e.target.value)}
-                                                    className="w-24 rounded border border-slate-200 px-2 py-1 text-sm"
-                                                />
+                                                <div className="flex items-center gap-1">
+                                                    <input
+                                                        type="number"
+                                                        min="0"
+                                                        step="any"
+                                                        value={i.quantidadeRecebida}
+                                                        onChange={(e) => atualizarItem(i.chave, 'quantidadeRecebida', e.target.value)}
+                                                        className="w-24 rounded border border-slate-200 px-2 py-1 text-sm"
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setPesandoChave(i.chave)}
+                                                        title="Ler peso da etiqueta"
+                                                        className="rounded px-1.5 py-1 text-sm hover:bg-slate-100"
+                                                    >
+                                                        ⚖️
+                                                    </button>
+                                                </div>
                                             </td>
                                             <td className="px-4 py-2">
                                                 <input
@@ -471,6 +623,50 @@ export default function EntradaEstoquePage() {
                         {entrada.numeroNf && <span className="ml-2 text-slate-400">NF {entrada.numeroNf}</span>}
                         {entrada.chaveAcesso && <span className="ml-2 block font-mono text-xs text-slate-400">{entrada.chaveAcesso}</span>}
                     </div>
+                    {entrada.itens.length === 0 ? (
+                        <div
+                            onDragOver={(e) => {
+                                e.preventDefault();
+                                setArrastandoXml(true);
+                            }}
+                            onDragLeave={() => setArrastandoXml(false)}
+                            onDrop={(e) => {
+                                e.preventDefault();
+                                setArrastandoXml(false);
+                                const file = e.dataTransfer.files?.[0];
+                                if (file) void onImportarXml(file);
+                            }}
+                            className="p-5"
+                        >
+                            <p className="text-sm font-semibold text-slate-900">📄 Não encontramos os dados automaticamente</p>
+                            <p className="mt-1 text-xs text-slate-500">
+                                Sem certificado digital configurado, não dá para buscar a nota na SEFAZ só pela chave. Anexe o XML
+                                desta nota (baixado do fornecedor ou do portal da SEFAZ) para completar os itens automaticamente.
+                            </p>
+                            <label
+                                className={`mt-4 flex cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed px-4 py-8 text-center transition-colors ${
+                                    arrastandoXml ? 'border-accent bg-accent/5' : 'border-slate-200 hover:bg-slate-50'
+                                }`}
+                            >
+                                <span className="text-2xl">⬆️</span>
+                                <span className="text-sm font-medium text-slate-700">Arraste o XML aqui ou clique para selecionar</span>
+                                <span className="text-xs text-slate-400">.xml da NF-e</span>
+                                <input
+                                    type="file"
+                                    accept=".xml,text/xml,application/xml"
+                                    className="hidden"
+                                    onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        e.target.value = '';
+                                        if (file) void onImportarXml(file);
+                                    }}
+                                />
+                            </label>
+                            <button type="button" onClick={resetar} className="mt-3 text-xs text-slate-500 hover:underline">
+                                ou cancele e lance os itens manualmente
+                            </button>
+                        </div>
+                    ) : (
                     <table className="w-full text-sm">
                         <thead className="bg-slate-50 text-left text-xs uppercase text-slate-500">
                             <tr>
@@ -523,15 +719,9 @@ export default function EntradaEstoquePage() {
                                     </td>
                                 </tr>
                             ))}
-                            {entrada.itens.length === 0 && (
-                                <tr>
-                                    <td colSpan={3} className="px-4 py-6 text-center text-sm text-slate-400">
-                                        Sem itens ainda — importe o XML da nota para preencher automaticamente.
-                                    </td>
-                                </tr>
-                            )}
                         </tbody>
                     </table>
+                    )}
                 </div>
             )}
 
@@ -565,6 +755,18 @@ export default function EntradaEstoquePage() {
                         onDetectar={(valor) => void (scanner === 'produto' ? onDetectarProduto(valor) : onDetectarDanfe(valor))}
                         onFechar={() => setScanner(null)}
                     />
+                </Suspense>
+            )}
+
+            {pesandoChave !== null && (
+                <Suspense
+                    fallback={
+                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black text-sm text-white">
+                            Carregando câmera...
+                        </div>
+                    }
+                >
+                    <LeitorPeso onDetectar={onDetectarPeso} onFechar={() => setPesandoChave(null)} />
                 </Suspense>
             )}
         </AppShell>

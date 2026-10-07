@@ -22,6 +22,8 @@ export interface SaldoCore {
     unidadeId: number | null;
     quantidade: number;
     custoMedio: number | null;
+    estoqueMinimo: number | null;
+    abaixoMinimo: boolean;
 }
 
 export interface FornecedorDto {
