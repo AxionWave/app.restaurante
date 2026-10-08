@@ -33,10 +33,10 @@ export default function SelecaoUnidade() {
     }
 
     return (
-        <label className="flex items-center gap-2 text-xs text-slate-500">
+        <label className="ml-auto flex items-center gap-2 text-[11px] uppercase tracking-[0.16em] text-ink/45">
             <span className="hidden sm:inline">Unidade</span>
             <select
-                className="rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-sm text-slate-700 focus:border-accent focus:outline-none"
+                className="field w-auto py-1.5 text-sm normal-case tracking-normal text-ink"
                 value={unidadeAtivaId ?? ''}
                 onChange={(e) => setUnidadeAtivaId(e.target.value ? Number(e.target.value) : null)}
             >

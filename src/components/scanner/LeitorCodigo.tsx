@@ -155,7 +155,7 @@ export default function LeitorCodigo({ formatos, onDetectar, onFechar, titulo }:
     return (
         <div className="fixed inset-0 z-50 flex flex-col bg-black">
             <div className="flex items-center justify-between bg-black/80 px-4 py-3 text-white">
-                <p className="text-sm font-medium">{titulo || 'Escanear'}</p>
+                <p className="font-display text-xl">{titulo || 'Escanear'}</p>
                 <button type="button" onClick={onFechar} className="rounded px-2 py-1 text-sm text-white/80 hover:text-white">
                     Fechar
                 </button>
@@ -165,7 +165,7 @@ export default function LeitorCodigo({ formatos, onDetectar, onFechar, titulo }:
                 <div className="relative flex-1 overflow-hidden">
                     <video ref={videoRef} muted playsInline className="h-full w-full object-cover" />
                     <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                        <div className="h-40 w-64 rounded-lg border-2 border-white/70" />
+                        <div className="h-40 w-64 border border-brass-bright/80" />
                     </div>
                 </div>
             )}
@@ -175,7 +175,7 @@ export default function LeitorCodigo({ formatos, onDetectar, onFechar, titulo }:
                     <p className="text-sm text-white/80">
                         {erro || 'Use a câmera do aparelho para fotografar o código.'}
                     </p>
-                    <label className="cursor-pointer rounded-lg bg-accent px-5 py-3 text-sm font-semibold text-white">
+                    <label className="btn-brass cursor-pointer">
                         Tirar foto do código
                         <input
                             type="file"

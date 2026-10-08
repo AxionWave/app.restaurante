@@ -86,7 +86,7 @@ export default function LeitorPeso({ onDetectar, onFechar }: LeitorPesoProps) {
     return (
         <div className="fixed inset-0 z-50 flex flex-col bg-black">
             <div className="flex items-center justify-between bg-black/80 px-4 py-3 text-white">
-                <p className="text-sm font-medium">⚖️ Ler peso da etiqueta</p>
+                <p className="font-display text-xl">Ler peso da etiqueta</p>
                 <button type="button" onClick={onFechar} className="rounded px-2 py-1 text-sm text-white/80 hover:text-white">
                     Fechar
                 </button>
@@ -96,14 +96,14 @@ export default function LeitorPeso({ onDetectar, onFechar }: LeitorPesoProps) {
                 <div className="relative flex-1 overflow-hidden">
                     <video ref={videoRef} muted playsInline className="h-full w-full object-cover" />
                     <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                        <div className="h-24 w-64 rounded-lg border-2 border-white/70" />
+                        <div className="h-24 w-64 border border-brass-bright/80" />
                     </div>
                     <div className="absolute inset-x-0 bottom-6 flex justify-center">
                         <button
                             type="button"
                             disabled={processando}
                             onClick={tirarFoto}
-                            className="rounded-full bg-accent px-6 py-3 text-sm font-semibold text-white disabled:opacity-50"
+                            className="btn-brass disabled:opacity-50"
                         >
                             {processando ? 'Lendo...' : 'Tirar foto'}
                         </button>
@@ -114,7 +114,7 @@ export default function LeitorPeso({ onDetectar, onFechar }: LeitorPesoProps) {
             {usarFallbackArquivo && (
                 <div className="flex flex-1 flex-col items-center justify-center gap-4 p-6 text-center text-white">
                     <p className="text-sm text-white/80">Use a câmera do aparelho para fotografar o peso na etiqueta.</p>
-                    <label className="cursor-pointer rounded-lg bg-accent px-5 py-3 text-sm font-semibold text-white">
+                    <label className="btn-brass cursor-pointer">
                         {processando ? 'Lendo...' : 'Tirar foto da etiqueta'}
                         <input
                             type="file"

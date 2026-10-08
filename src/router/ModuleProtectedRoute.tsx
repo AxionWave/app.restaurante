@@ -15,14 +15,13 @@ export default function ModuleProtectedRoute({
     }
     if (!codes.some((c) => authService.hasModulo(c))) {
         return (
-            <div className="flex min-h-screen items-center justify-center p-6">
-                <div className="max-w-md rounded-xl border border-slate-200 bg-white p-8 text-center shadow-sm">
-                    <h1 className="text-lg font-semibold text-slate-900">Sem acesso a este módulo</h1>
-                    <p className="mt-2 text-sm text-slate-600">
-                        O código <code className="rounded bg-slate-100 px-1">{codes.join(' / ')}</code> não está no seu JWT.
-                        Peça acesso no ASC e faça login novamente.
+            <div className="flex min-h-screen items-center justify-center bg-ivory p-6">
+                <div className="max-w-md border border-line bg-paper px-8 py-10 text-center">
+                    <h1 className="font-display text-3xl text-ink">Esta área não está liberada</h1>
+                    <p className="mt-3 text-sm leading-relaxed text-ink/60">
+                        Peça o acesso no ASC e entre novamente.
                     </p>
-                    <a href="/inicio" className="mt-6 inline-block text-sm font-medium text-accent hover:underline">
+                    <a href="/inicio" className="mt-8 inline-block text-[11px] uppercase tracking-[0.18em] text-brass">
                         Voltar ao início
                     </a>
                 </div>

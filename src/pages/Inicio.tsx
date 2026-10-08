@@ -5,58 +5,51 @@ import { authService } from '@core/services';
 import { httpClient } from '@core/services/http.service';
 import { API_CONFIG } from '@core/config';
 import { MODULOS } from '@/constants/moduleCodes';
+import IconeNav from '@/components/IconeNav';
 
-interface MeResponse {
-    product: string;
-    sigla: string;
-    userId: number;
-    username: string;
-    email: string;
-    empresaId: number;
-    roles: string[];
-    modulos: string[];
+function saudacao() {
+    const hora = new Date().getHours();
+    if (hora < 12) return 'Bom dia';
+    if (hora < 18) return 'Boa tarde';
+    return 'Boa noite';
 }
 
 export default function InicioPage() {
     const user = authService.getStoredUserInfo();
-    const [me, setMe] = useState<MeResponse | null>(null);
     const [error, setError] = useState('');
+    const nome = user?.email || user?.username || 'usuário';
+    const atalhos = MODULOS.filter((m) => m.path !== '/inicio');
 
     useEffect(() => {
         httpClient
-            .get<MeResponse>(`${API_CONFIG.productBase}/me`)
-            .then((r) => setMe(r.data))
-            .catch(() => setError('Não foi possível falar com a API via Gateway. Suba api.restaurante e confira a rota.'));
+            .get(`${API_CONFIG.productBase}/me`)
+            .catch(() => setError('Não foi possível abrir a casa agora. Tente de novo em instantes.'));
     }, []);
 
     return (
         <AppShell>
-            <h1 className="text-2xl font-semibold text-slate-900">Painel Orion</h1>
-            <p className="mt-1 text-sm text-slate-500">Olá, {user?.email || user?.username || 'usuário'}.</p>
+            <p className="kicker">Salão</p>
+            <h1 className="display mt-3">
+                {saudacao()}
+                <span className="italic text-ink/70">, {nome}.</span>
+            </h1>
+            <p className="lede mt-4">O serviço da casa começa por aqui. Escolha o que abre agora.</p>
 
-            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {MODULOS.filter((m) => m.path !== '/inicio').map((m) => (
+            <div className="mt-12 grid gap-px bg-line sm:grid-cols-2">
+                {atalhos.map((m) => (
                     <Link
                         key={m.codigo}
                         to={m.path}
-                        className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm hover:border-accent"
+                        className="group bg-paper px-6 py-7 transition hover:bg-ivory"
                     >
-                        <p className="text-sm font-semibold text-slate-900">{m.nome}</p>
-                        <p className="mt-1 text-sm text-slate-500">{m.descricao}</p>
-                        <p className="mt-3 font-mono text-[11px] text-slate-400">{m.codigo}</p>
+                        <IconeNav path={m.path} className="h-5 w-5 text-brass" />
+                        <p className="mt-4 font-display text-4xl text-ink transition group-hover:translate-x-0.5">{m.nome}</p>
+                        <p className="mt-2 text-sm text-ink/55">{m.descricao}</p>
                     </Link>
                 ))}
             </div>
 
-            <section className="mt-10 rounded-xl border border-slate-200 bg-white p-5">
-                <h2 className="text-sm font-semibold text-slate-900">Integração API (GET {API_CONFIG.productBase}/me)</h2>
-                {error && <p className="mt-2 text-sm text-amber-800">{error}</p>}
-                {me && (
-                    <pre className="mt-3 overflow-auto rounded-lg bg-slate-50 p-3 text-xs text-slate-700">
-                        {JSON.stringify(me, null, 2)}
-                    </pre>
-                )}
-            </section>
+            {error && <p className="alert-warn mt-10">{error}</p>}
         </AppShell>
     );
 }

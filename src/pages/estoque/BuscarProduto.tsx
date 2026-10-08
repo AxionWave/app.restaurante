@@ -61,14 +61,14 @@ export default function BuscarProduto({ onEscolher, placeholder }: BuscarProduto
                 onFocus={() => setAberto(true)}
                 onBlur={() => setTimeout(() => setAberto(false), 150)}
                 placeholder={placeholder || 'Buscar produto por nome ou código...'}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-accent focus:outline-none"
+                className="field"
             />
             {aberto && termo.trim() && (
-                <div className="absolute z-10 mt-1 max-h-64 w-full overflow-auto rounded-lg border border-slate-200 bg-white shadow-lg">
-                    {carregando && <p className="px-3 py-2 text-xs text-slate-400">Buscando...</p>}
+                <div className="absolute z-10 mt-1 max-h-64 w-full overflow-auto border border-line bg-paper shadow-maison">
+                    {carregando && <p className="px-3 py-2 text-xs text-ink/40">Buscando...</p>}
                     {!carregando && resultados.length === 0 && (
-                        <div className="px-3 py-2">
-                            <p className="text-xs text-slate-400">Nenhum produto encontrado.</p>
+                        <div className="px-3 py-3">
+                            <p className="text-xs text-ink/45">Nenhum produto encontrado.</p>
                             <button
                                 type="button"
                                 onMouseDown={(e) => {
@@ -76,9 +76,9 @@ export default function BuscarProduto({ onEscolher, placeholder }: BuscarProduto
                                     setCriandoNovo(true);
                                     setAberto(false);
                                 }}
-                                className="mt-1 text-xs font-medium text-accent hover:underline"
+                                className="mt-2 text-xs uppercase tracking-[0.14em] text-brass"
                             >
-                                + cadastrar novo produto
+                                Cadastrar novo produto
                             </button>
                         </div>
                     )}
@@ -93,10 +93,10 @@ export default function BuscarProduto({ onEscolher, placeholder }: BuscarProduto
                                 setResultados([]);
                                 setAberto(false);
                             }}
-                            className="block w-full px-3 py-2 text-left text-sm hover:bg-slate-50"
+                            className="block w-full px-3 py-2.5 text-left text-sm hover:bg-ivory"
                         >
-                            <span className="font-medium text-slate-900">{p.nome}</span>
-                            <span className="ml-2 font-mono text-xs text-slate-400">{p.codigo}</span>
+                            <span className="font-medium text-ink">{p.nome}</span>
+                            <span className="ml-2 font-mono text-xs text-ink/40">{p.codigo}</span>
                         </button>
                     ))}
                 </div>

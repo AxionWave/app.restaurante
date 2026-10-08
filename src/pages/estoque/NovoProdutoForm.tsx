@@ -47,34 +47,34 @@ export default function NovoProdutoForm({ codigoBarrasSugerido, nomeSugerido, on
     }
 
     return (
-        <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
-            <p className="text-sm font-semibold text-slate-900">Novo produto</p>
+        <div className="border border-brass/30 bg-brass-muted p-5">
+            <p className="font-display text-2xl text-ink">Novo produto</p>
             {codigoBarrasSugerido && (
-                <p className="mt-1 font-mono text-xs text-slate-500">Código de barras: {codigoBarrasSugerido}</p>
+                <p className="mt-1 font-mono text-xs text-ink/50">Código de barras: {codigoBarrasSugerido}</p>
             )}
-            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
                 <div>
-                    <label className="text-xs font-medium text-slate-600">Código (SKU) *</label>
+                    <label className="text-[11px] uppercase tracking-[0.16em] text-ink/50">Código (SKU) *</label>
                     <input
                         value={codigo}
                         onChange={(e) => setCodigo(e.target.value)}
-                        className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-accent focus:outline-none"
+                        className="field mt-1.5"
                     />
                 </div>
                 <div>
-                    <label className="text-xs font-medium text-slate-600">Nome *</label>
+                    <label className="text-[11px] uppercase tracking-[0.16em] text-ink/50">Nome *</label>
                     <input
                         value={nome}
                         onChange={(e) => setNome(e.target.value)}
-                        className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-accent focus:outline-none"
+                        className="field mt-1.5"
                     />
                 </div>
                 <div>
-                    <label className="text-xs font-medium text-slate-600">Unidade de estoque</label>
+                    <label className="text-[11px] uppercase tracking-[0.16em] text-ink/50">Unidade de estoque</label>
                     <select
                         value={unidadeMedida}
                         onChange={(e) => setUnidadeMedida(e.target.value)}
-                        className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-accent focus:outline-none"
+                        className="field mt-1.5"
                     >
                         {UNIDADES.map((u) => (
                             <option key={u} value={u}>
@@ -84,11 +84,11 @@ export default function NovoProdutoForm({ codigoBarrasSugerido, nomeSugerido, on
                     </select>
                 </div>
                 <div>
-                    <label className="text-xs font-medium text-slate-600">Unidade de compra (opcional)</label>
+                    <label className="text-[11px] uppercase tracking-[0.16em] text-ink/50">Unidade de compra (opcional)</label>
                     <select
                         value={unidadeCompra}
                         onChange={(e) => setUnidadeCompra(e.target.value)}
-                        className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-accent focus:outline-none"
+                        className="field mt-1.5"
                     >
                         <option value="">— igual à unidade de estoque —</option>
                         {UNIDADES.map((u) => (
@@ -100,7 +100,7 @@ export default function NovoProdutoForm({ codigoBarrasSugerido, nomeSugerido, on
                 </div>
                 {unidadeCompra && (
                     <div>
-                        <label className="text-xs font-medium text-slate-600">
+                        <label className="text-[11px] uppercase tracking-[0.16em] text-ink/50">
                             1 {unidadeCompra} equivale a quantas {unidadeMedida}?
                         </label>
                         <input
@@ -110,22 +110,17 @@ export default function NovoProdutoForm({ codigoBarrasSugerido, nomeSugerido, on
                             value={fatorConversao}
                             onChange={(e) => setFatorConversao(e.target.value)}
                             placeholder="ex.: 12"
-                            className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-accent focus:outline-none"
+                            className="field mt-1.5"
                         />
                     </div>
                 )}
             </div>
-            {erro && <p className="mt-2 text-xs text-red-700">{erro}</p>}
-            <div className="mt-4 flex gap-2">
-                <button
-                    type="button"
-                    disabled={salvando}
-                    onClick={salvar}
-                    className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
-                >
+            {erro && <p className="alert-error mt-3">{erro}</p>}
+            <div className="mt-5 flex gap-2">
+                <button type="button" disabled={salvando} onClick={salvar} className="btn-primary">
                     {salvando ? 'Salvando...' : 'Cadastrar e usar'}
                 </button>
-                <button type="button" onClick={onCancelar} className="rounded-lg px-4 py-2 text-sm text-slate-500 hover:text-slate-700">
+                <button type="button" onClick={onCancelar} className="btn-ghost">
                     Cancelar
                 </button>
             </div>

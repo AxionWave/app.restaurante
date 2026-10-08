@@ -1,11 +1,23 @@
 import AppShell from '@/components/AppShell';
+import PageIntro from '@/components/PageIntro';
 
 export default function MesasPage() {
     return (
         <AppShell>
-            <h1 className="text-2xl font-semibold text-slate-900">Mesas</h1>
-            <p className="mt-2 text-sm text-slate-500">Mesas e salão. Tela placeholder para o time implementar.</p>
-            <p className="mt-4 font-mono text-xs text-slate-400">ORI0000003</p>
+            <PageIntro
+                eyebrow="Salão"
+                title="Mesas"
+                description="O mapa do salão. Ocupação, lugares e o ritmo do serviço."
+            />
+            <div className="panel mt-10 grid gap-px bg-line sm:grid-cols-3">
+                {['Salão', 'Varanda', 'Reservas'].map((zona) => (
+                    <div key={zona} className="bg-paper px-6 py-10">
+                        <p className="kicker">Ambiente</p>
+                        <p className="mt-3 font-display text-3xl text-ink">{zona}</p>
+                        <p className="mt-2 text-sm text-ink/50">O mapa desta área entra quando as mesas forem definidas.</p>
+                    </div>
+                ))}
+            </div>
         </AppShell>
     );
 }

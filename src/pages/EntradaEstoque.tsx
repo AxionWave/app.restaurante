@@ -273,22 +273,22 @@ export default function EntradaEstoquePage() {
         return (
             <AppShell>
                 <div className="mx-auto max-w-2xl">
-                    <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-6">
-                        <h1 className="text-lg font-semibold text-emerald-900">Entrada confirmada</h1>
-                        <p className="mt-1 text-sm text-emerald-800">
+                    <div className="rounded-sm border border-[#C9D7CE] bg-[#F3F7F4] p-6">
+                        <h1 className="text-lg font-semibold text-[#1E3A2F]">Entrada confirmada</h1>
+                        <p className="mt-1 text-sm text-[#2F4A3C]">
                             {confirmada.itens.length} item(ns) lançado(s) no estoque{confirmada.numeroNf ? ` — NF ${confirmada.numeroNf}` : ''}.
                         </p>
                     </div>
-                    <div className="mt-4 overflow-hidden rounded-xl border border-slate-200 bg-white">
+                    <div className="mt-4 overflow-hidden rounded-sm border border-line bg-paper">
                         <table className="w-full text-sm">
-                            <thead className="bg-slate-50 text-left text-xs uppercase text-slate-500">
+                            <thead className="bg-ivory text-left text-xs uppercase text-ink/55">
                                 <tr>
                                     <th className="px-4 py-2">Produto</th>
                                     <th className="px-4 py-2">Entrou</th>
                                     <th className="px-4 py-2">Saldo agora</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-100">
+                            <tbody className="divide-y divide-line">
                                 {confirmada.itens.map((i) => (
                                     <tr key={i.id}>
                                         <td className="px-4 py-2">{i.produtoCodigo}</td>
@@ -303,11 +303,11 @@ export default function EntradaEstoquePage() {
                         <button
                             type="button"
                             onClick={resetar}
-                            className="rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-white"
+                            className="btn-primary"
                         >
                             Nova entrada
                         </button>
-                        <Link to="/estoque" className="rounded-lg px-4 py-2.5 text-sm text-slate-500 hover:text-slate-700">
+                        <Link to="/estoque" className="rounded-sm px-4 py-2.5 text-sm text-ink/55 hover:text-ink/80">
                             Ver estoque
                         </Link>
                     </div>
@@ -318,14 +318,14 @@ export default function EntradaEstoquePage() {
 
     return (
         <AppShell>
-            <Link to="/estoque" className="text-xs text-slate-500 hover:underline">
-                ← Voltar ao estoque
+            <Link to="/estoque" className="text-[11px] uppercase tracking-[0.18em] text-brass hover:text-ink">
+                Voltar ao estoque
             </Link>
-            <h1 className="mt-2 text-2xl font-semibold text-slate-900">Nova entrada de estoque</h1>
-            <p className="mt-1 text-sm text-slate-500">Compra com nota, sem nota, devolução ou contagem de inventário.</p>
+            <h1 className="display mt-3">Nova entrada</h1>
+            <p className="lede mt-3">Compra com nota, sem nota, devolução ou contagem de inventário.</p>
 
             {!unidadeAtivaId && (
-                <p className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-800">
+                <p className="mt-4 rounded-sm border border-brass/30 bg-brass-muted px-4 py-2 text-sm text-[#6B4E24]">
                     Selecione a unidade no topo da página antes de continuar.
                 </p>
             )}
@@ -337,24 +337,24 @@ export default function EntradaEstoquePage() {
                         type="button"
                         disabled={!!entrada}
                         onClick={() => setMotivo(m)}
-                        className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
-                            motivo === m ? 'bg-accent text-white' : 'bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50'
+                        className={`rounded-sm px-4 py-1.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+                            motivo === m ? 'bg-espresso text-ivory' : 'bg-paper text-ink/70 ring-1 ring-line hover:bg-ivory'
                         }`}
                     >
                         {MOTIVOS[m].label}
                     </button>
                 ))}
             </div>
-            <p className="mt-2 text-xs text-slate-500">{info.ajuda}</p>
+            <p className="mt-2 text-xs text-ink/55">{info.ajuda}</p>
 
-            {erro && <p className="mt-4 rounded-lg bg-red-50 px-4 py-2 text-sm text-red-700">{erro}</p>}
-            {aviso && <p className="mt-4 rounded-lg bg-sky-50 px-4 py-2 text-sm text-sky-800">{aviso}</p>}
+            {erro && <p className="mt-4 rounded-sm bg-[#F8F1F1] px-4 py-2 text-sm text-[#7A3030]">{erro}</p>}
+            {aviso && <p className="mt-4 rounded-sm bg-ivory px-4 py-2 text-sm text-ink/70">{aviso}</p>}
 
             {!entrada && (
                 <>
-                    <div className="mt-6 rounded-xl border border-slate-200 bg-white p-5">
-                        <p className="text-sm font-semibold text-slate-900">Adicionar produto</p>
-                        <p className="mt-0.5 text-xs text-slate-500">Busque pelo nome ou use a câmera — o jeito mais rápido.</p>
+                    <div className="mt-6 rounded-sm border border-line bg-paper p-5">
+                        <p className="text-sm font-semibold text-ink">Adicionar produto</p>
+                        <p className="mt-0.5 text-xs text-ink/55">Busque pelo nome ou use a câmera — o jeito mais rápido.</p>
                         <div className="mt-3 flex flex-col gap-3 sm:flex-row">
                             <div className="flex-1">
                                 <BuscarProduto onEscolher={adicionarAoCarrinho} />
@@ -364,38 +364,38 @@ export default function EntradaEstoquePage() {
                             <button
                                 type="button"
                                 onClick={() => setScanner('produto')}
-                                className="flex items-center justify-center gap-2 rounded-lg bg-slate-900 px-4 py-3 text-sm font-medium text-white"
+                                className="flex items-center justify-center gap-2 rounded-sm bg-espresso px-4 py-3 text-sm font-medium text-white"
                             >
-                                📷 Escanear código
+                                Escanear código
                             </button>
                             <button
                                 type="button"
                                 onClick={() => setPesandoChave('')}
-                                className="flex items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-medium text-accent ring-1 ring-accent/40"
+                                className="flex items-center justify-center gap-2 rounded-sm px-4 py-3 text-sm font-medium text-accent ring-1 ring-accent/40"
                             >
-                                ⚖️ Ler peso da etiqueta
+                                Ler peso da etiqueta
                             </button>
                             <button
                                 type="button"
                                 onClick={() => setCriandoProdutoManual(true)}
-                                className="flex items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-medium text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50"
+                                className="flex items-center justify-center gap-2 rounded-sm px-4 py-3 text-sm font-medium text-ink/70 ring-1 ring-line hover:bg-ivory"
                             >
-                                ✍️ Cadastrar produto novo
+                                Cadastrar produto novo
                             </button>
                         </div>
 
                         {pesoPendente != null && (
-                            <p className="mt-3 rounded-lg bg-sky-50 px-3 py-2 text-xs text-sky-800">
-                                ⚖️ Peso pronto: <strong>{pesoPendente} kg</strong> — escaneie ou busque o produto pra aplicar.
+                            <p className="mt-3 rounded-sm bg-ivory px-3 py-2 text-xs text-ink/70">
+                                Peso pronto: <strong>{pesoPendente} kg</strong> — escaneie ou busque o produto pra aplicar.
                             </p>
                         )}
 
                         {motivo === 'COMPRA' && (
-                            <div className="mt-5 border-t border-slate-100 pt-4">
+                            <div className="mt-5 border-t border-line pt-4">
                                 <button
                                     type="button"
                                     onClick={() => setMostrarNotaFiscal((v) => !v)}
-                                    className="text-xs font-medium text-slate-500 hover:text-slate-700 hover:underline"
+                                    className="text-xs font-medium text-ink/55 hover:text-ink/80 hover:underline"
                                 >
                                     {mostrarNotaFiscal ? '▾' : '▸'} Já tem a nota fiscal? (XML, DANFE ou chave de acesso)
                                 </button>
@@ -405,18 +405,18 @@ export default function EntradaEstoquePage() {
                                         <button
                                             type="button"
                                             onClick={() => setScanner('danfe')}
-                                            className="whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium text-accent ring-1 ring-accent/40"
+                                            className="whitespace-nowrap rounded-sm px-4 py-2 text-sm font-medium text-accent ring-1 ring-accent/40"
                                         >
-                                            📷 Escanear DANFE
+                                            Escanear DANFE
                                         </button>
                                         <button
                                             type="button"
                                             onClick={() => setMostrarInputChave((v) => !v)}
-                                            className="whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50"
+                                            className="whitespace-nowrap rounded-sm px-4 py-2 text-sm font-medium text-ink/70 ring-1 ring-line hover:bg-ivory"
                                         >
                                             Digitar a chave
                                         </button>
-                                        <label className="cursor-pointer whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50">
+                                        <label className="cursor-pointer whitespace-nowrap rounded-sm px-4 py-2 text-sm font-medium text-ink/70 ring-1 ring-line hover:bg-ivory">
                                             Importar XML
                                             <input
                                                 type="file"
@@ -433,20 +433,20 @@ export default function EntradaEstoquePage() {
                                 )}
 
                                 {mostrarInputChave && (
-                                    <div className="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-4">
-                                        <label className="text-xs font-medium text-slate-600">Chave de acesso da NF-e (44 dígitos)</label>
+                                    <div className="mt-4 rounded-sm border border-line bg-ivory p-4">
+                                        <label className="text-xs font-medium text-ink/70">Chave de acesso da NF-e (44 dígitos)</label>
                                         <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center">
                                             {(() => {
                                                 const digitos = chaveDigitada.length;
                                                 const valida = digitos === 44 && chaveValida(chaveDigitada);
                                                 const corBorda =
                                                     digitos === 0
-                                                        ? 'border-slate-200 focus:border-accent'
+                                                        ? 'border-line focus:border-accent'
                                                         : valida
-                                                          ? 'border-emerald-400'
+                                                          ? 'border-[#6B8F78]'
                                                           : digitos === 44
-                                                            ? 'border-red-300'
-                                                            : 'border-amber-300';
+                                                            ? 'border-[#C4A0A0]'
+                                                            : 'border-brass';
                                                 return (
                                                     <>
                                                         <div className="relative flex-1">
@@ -454,12 +454,12 @@ export default function EntradaEstoquePage() {
                                                                 value={chaveDigitada}
                                                                 onChange={(e) => setChaveDigitada(e.target.value.replace(/\D/g, '').slice(0, 44))}
                                                                 placeholder="0000 0000 0000 0000 0000 0000 0000 0000 0000 0000"
-                                                                className={`w-full rounded-lg border px-3 py-2 font-mono text-sm tracking-tight outline-none ${corBorda}`}
+                                                                className={`w-full rounded-sm border px-3 py-2 font-mono text-sm tracking-tight outline-none ${corBorda}`}
                                                             />
                                                             {digitos > 0 && (
                                                                 <span
                                                                     className={`absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium ${
-                                                                        valida ? 'text-emerald-600' : digitos === 44 ? 'text-red-600' : 'text-amber-600'
+                                                                        valida ? 'text-[#2F4A3C]' : digitos === 44 ? 'text-[#7A3030]' : 'text-[#6B4E24]'
                                                                     }`}
                                                                 >
                                                                     {valida ? '✓' : digitos === 44 ? 'chave inválida' : `${digitos}/44`}
@@ -470,7 +470,7 @@ export default function EntradaEstoquePage() {
                                                             type="button"
                                                             disabled={!valida || enviando}
                                                             onClick={() => void importarPelaChave(chaveDigitada)}
-                                                            className="whitespace-nowrap rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40"
+                                                            className="whitespace-nowrap rounded-sm bg-accent px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40"
                                                         >
                                                             Buscar
                                                         </button>
@@ -504,9 +504,9 @@ export default function EntradaEstoquePage() {
                     </div>
 
                     {carrinho.length > 0 && (
-                        <div className="mt-4 overflow-hidden rounded-xl border border-slate-200 bg-white">
+                        <div className="mt-4 overflow-hidden rounded-sm border border-line bg-paper">
                             <table className="w-full text-sm">
-                                <thead className="bg-slate-50 text-left text-xs uppercase text-slate-500">
+                                <thead className="bg-ivory text-left text-xs uppercase text-ink/55">
                                     <tr>
                                         <th className="px-4 py-2">Produto</th>
                                         <th className="px-4 py-2">{motivo === 'INVENTARIO' ? 'Contagem' : 'Quantidade'}</th>
@@ -515,12 +515,12 @@ export default function EntradaEstoquePage() {
                                         <th className="px-4 py-2" />
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-slate-100">
+                                <tbody className="divide-y divide-line">
                                     {carrinho.map((i) => (
                                         <tr key={i.chave}>
                                             <td className="px-4 py-2">
-                                                <p className="font-medium text-slate-900">{i.produtoNome}</p>
-                                                <p className="font-mono text-xs text-slate-400">{i.produtoCodigo}</p>
+                                                <p className="font-medium text-ink">{i.produtoNome}</p>
+                                                <p className="font-mono text-xs text-ink/40">{i.produtoCodigo}</p>
                                             </td>
                                             <td className="px-4 py-2">
                                                 <div className="flex items-center gap-1">
@@ -530,15 +530,15 @@ export default function EntradaEstoquePage() {
                                                         step="any"
                                                         value={i.quantidadeRecebida}
                                                         onChange={(e) => atualizarItem(i.chave, 'quantidadeRecebida', e.target.value)}
-                                                        className="w-24 rounded border border-slate-200 px-2 py-1 text-sm"
+                                                        className="w-24 rounded border border-line px-2 py-1 text-sm"
                                                     />
                                                     <button
                                                         type="button"
                                                         onClick={() => setPesandoChave(i.chave)}
                                                         title="Ler peso da etiqueta"
-                                                        className="rounded px-1.5 py-1 text-sm hover:bg-slate-100"
+                                                        className="rounded px-1.5 py-1 text-sm hover:bg-ivory"
                                                     >
-                                                        ⚖️
+                                                        Peso
                                                     </button>
                                                 </div>
                                             </td>
@@ -549,7 +549,7 @@ export default function EntradaEstoquePage() {
                                                     step="any"
                                                     value={i.fatorConversao}
                                                     onChange={(e) => atualizarItem(i.chave, 'fatorConversao', e.target.value)}
-                                                    className="w-20 rounded border border-slate-200 px-2 py-1 text-sm"
+                                                    className="w-20 rounded border border-line px-2 py-1 text-sm"
                                                 />
                                             </td>
                                             <td className="px-4 py-2">
@@ -560,11 +560,11 @@ export default function EntradaEstoquePage() {
                                                     placeholder="opcional"
                                                     value={i.valorUnitarioNf}
                                                     onChange={(e) => atualizarItem(i.chave, 'valorUnitarioNf', e.target.value)}
-                                                    className="w-24 rounded border border-slate-200 px-2 py-1 text-sm"
+                                                    className="w-24 rounded border border-line px-2 py-1 text-sm"
                                                 />
                                             </td>
                                             <td className="px-4 py-2 text-right">
-                                                <button type="button" onClick={() => removerItem(i.chave)} className="text-xs text-red-600 hover:underline">
+                                                <button type="button" onClick={() => removerItem(i.chave)} className="text-xs text-[#7A3030] hover:underline">
                                                     remover
                                                 </button>
                                             </td>
@@ -576,52 +576,52 @@ export default function EntradaEstoquePage() {
                     )}
 
                     {motivo === 'COMPRA' && (
-                        <div className="mt-4 grid gap-3 rounded-xl border border-slate-200 bg-white p-5 sm:grid-cols-3">
+                        <div className="mt-4 grid gap-3 rounded-sm border border-line bg-paper p-5 sm:grid-cols-3">
                             <div>
-                                <label className="text-xs font-medium text-slate-600">Fornecedor</label>
+                                <label className="text-xs font-medium text-ink/70">Fornecedor</label>
                                 <input
                                     value={fornecedorNome}
                                     onChange={(e) => setFornecedorNome(e.target.value)}
-                                    className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                                    className="mt-1 w-full rounded-sm border border-line px-3 py-2 text-sm"
                                 />
                             </div>
                             <div>
-                                <label className="text-xs font-medium text-slate-600">CNPJ</label>
+                                <label className="text-xs font-medium text-ink/70">CNPJ</label>
                                 <input
                                     value={fornecedorCnpj}
                                     onChange={(e) => setFornecedorCnpj(e.target.value)}
-                                    className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                                    className="mt-1 w-full rounded-sm border border-line px-3 py-2 text-sm"
                                 />
                             </div>
                             <div>
-                                <label className="text-xs font-medium text-slate-600">Nº da NF</label>
+                                <label className="text-xs font-medium text-ink/70">Nº da NF</label>
                                 <input
                                     value={numeroNf}
                                     onChange={(e) => setNumeroNf(e.target.value)}
-                                    className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                                    className="mt-1 w-full rounded-sm border border-line px-3 py-2 text-sm"
                                 />
                             </div>
                         </div>
                     )}
 
                     <div className="mt-4">
-                        <label className="text-xs font-medium text-slate-600">Observação</label>
+                        <label className="text-xs font-medium text-ink/70">Observação</label>
                         <textarea
                             value={observacao}
                             onChange={(e) => setObservacao(e.target.value)}
                             rows={2}
-                            className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                            className="mt-1 w-full rounded-sm border border-line px-3 py-2 text-sm"
                         />
                     </div>
                 </>
             )}
 
             {entrada && (
-                <div className="mt-6 overflow-hidden rounded-xl border border-slate-200 bg-white">
-                    <div className="border-b border-slate-100 px-4 py-3 text-sm text-slate-600">
+                <div className="mt-6 overflow-hidden rounded-sm border border-line bg-paper">
+                    <div className="border-b border-line px-4 py-3 text-sm text-ink/70">
                         {entrada.fornecedorNome && <span className="font-medium">{entrada.fornecedorNome}</span>}
-                        {entrada.numeroNf && <span className="ml-2 text-slate-400">NF {entrada.numeroNf}</span>}
-                        {entrada.chaveAcesso && <span className="ml-2 block font-mono text-xs text-slate-400">{entrada.chaveAcesso}</span>}
+                        {entrada.numeroNf && <span className="ml-2 text-ink/40">NF {entrada.numeroNf}</span>}
+                        {entrada.chaveAcesso && <span className="ml-2 block font-mono text-xs text-ink/40">{entrada.chaveAcesso}</span>}
                     </div>
                     {entrada.itens.length === 0 ? (
                         <div
@@ -638,19 +638,18 @@ export default function EntradaEstoquePage() {
                             }}
                             className="p-5"
                         >
-                            <p className="text-sm font-semibold text-slate-900">📄 Não encontramos os dados automaticamente</p>
-                            <p className="mt-1 text-xs text-slate-500">
+                            <p className="font-display text-2xl text-ink">Não encontramos os dados automaticamente</p>
+                            <p className="mt-1 text-xs text-ink/55">
                                 Sem certificado digital configurado, não dá para buscar a nota na SEFAZ só pela chave. Anexe o XML
                                 desta nota (baixado do fornecedor ou do portal da SEFAZ) para completar os itens automaticamente.
                             </p>
                             <label
-                                className={`mt-4 flex cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed px-4 py-8 text-center transition-colors ${
-                                    arrastandoXml ? 'border-accent bg-accent/5' : 'border-slate-200 hover:bg-slate-50'
+                                className={`mt-4 flex cursor-pointer flex-col items-center justify-center gap-1 rounded-sm border-2 border-dashed px-4 py-8 text-center transition-colors ${
+                                    arrastandoXml ? 'border-accent bg-accent/5' : 'border-line hover:bg-ivory'
                                 }`}
                             >
-                                <span className="text-2xl">⬆️</span>
-                                <span className="text-sm font-medium text-slate-700">Arraste o XML aqui ou clique para selecionar</span>
-                                <span className="text-xs text-slate-400">.xml da NF-e</span>
+                                <span className="text-sm font-medium text-ink/80">Arraste o XML aqui ou clique para selecionar</span>
+                                <span className="text-xs text-ink/40">.xml da NF-e</span>
                                 <input
                                     type="file"
                                     accept=".xml,text/xml,application/xml"
@@ -662,27 +661,27 @@ export default function EntradaEstoquePage() {
                                     }}
                                 />
                             </label>
-                            <button type="button" onClick={resetar} className="mt-3 text-xs text-slate-500 hover:underline">
+                            <button type="button" onClick={resetar} className="mt-3 text-xs text-ink/55 hover:underline">
                                 ou cancele e lance os itens manualmente
                             </button>
                         </div>
                     ) : (
                     <table className="w-full text-sm">
-                        <thead className="bg-slate-50 text-left text-xs uppercase text-slate-500">
+                        <thead className="bg-ivory text-left text-xs uppercase text-ink/55">
                             <tr>
                                 <th className="px-4 py-2">Item da nota</th>
                                 <th className="px-4 py-2">Qtd</th>
                                 <th className="px-4 py-2">Vínculo</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100">
+                        <tbody className="divide-y divide-line">
                             {entrada.itens.map((item) => (
                                 <tr key={item.id}>
                                     <td className="px-4 py-2">
-                                        <p className="text-slate-900">{item.descricaoNf || item.produtoCodigo}</p>
-                                        {item.codigoBarrasNf && <p className="font-mono text-xs text-slate-400">{item.codigoBarrasNf}</p>}
+                                        <p className="text-ink">{item.descricaoNf || item.produtoCodigo}</p>
+                                        {item.codigoBarrasNf && <p className="font-mono text-xs text-ink/40">{item.codigoBarrasNf}</p>}
                                         {item.divergencia && (
-                                            <p className="text-xs text-amber-700">
+                                            <p className="text-xs text-[#6B4E24]">
                                                 NF: {item.quantidadeNf} · recebido: {item.quantidadeRecebida}
                                             </p>
                                         )}
@@ -690,7 +689,7 @@ export default function EntradaEstoquePage() {
                                     <td className="px-4 py-2">{item.quantidadeRecebida}</td>
                                     <td className="px-4 py-2">
                                         {item.statusVinculo !== 'PENDENTE' ? (
-                                            <span className="text-xs font-medium text-emerald-700">
+                                            <span className="text-xs font-medium text-[#2F4A3C]">
                                                 {item.produtoCodigo} ✓
                                             </span>
                                         ) : itemCriandoProduto === item.id ? (
@@ -730,12 +729,12 @@ export default function EntradaEstoquePage() {
                     type="button"
                     disabled={enviando || !unidadeAtivaId || (entrada ? entrada.itens.length === 0 : carrinho.length === 0)}
                     onClick={() => void confirmarEntrada()}
-                    className="rounded-lg bg-accent px-6 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
+                    className="btn-primary"
                 >
                     {enviando ? 'Enviando...' : 'Confirmar entrada'}
                 </button>
                 {(entrada || carrinho.length > 0) && (
-                    <button type="button" onClick={resetar} className="rounded-lg px-4 py-2.5 text-sm text-slate-500 hover:text-slate-700">
+                    <button type="button" onClick={resetar} className="rounded-sm px-4 py-2.5 text-sm text-ink/55 hover:text-ink/80">
                         Cancelar
                     </button>
                 )}
