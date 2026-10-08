@@ -4,7 +4,7 @@ import AppShell from '@/components/AppShell';
 import { authService } from '@core/services';
 import { httpClient } from '@core/services/http.service';
 import { API_CONFIG } from '@core/config';
-import { MODULOS } from '@/constants/moduleCodes';
+import { MODULOS, codigosDoModulo } from '@/constants/moduleCodes';
 import IconeNav from '@/components/IconeNav';
 
 function saudacao() {
@@ -18,7 +18,7 @@ export default function InicioPage() {
     const user = authService.getStoredUserInfo();
     const [error, setError] = useState('');
     const nome = user?.email || user?.username || 'usuário';
-    const atalhos = MODULOS.filter((m) => m.path !== '/inicio');
+    const atalhos = MODULOS.filter((m) => m.path !== '/inicio' && codigosDoModulo(m).some((c) => authService.hasModulo(c)));
 
     useEffect(() => {
         httpClient
@@ -28,7 +28,7 @@ export default function InicioPage() {
 
     return (
         <AppShell>
-            <p className="kicker">Salão</p>
+            <p className="kicker">Restaurante</p>
             <h1 className="display mt-3">
                 {saudacao()}
                 <span className="italic text-ink/70">, {nome}.</span>

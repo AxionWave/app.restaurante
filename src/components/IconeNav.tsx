@@ -32,6 +32,12 @@ export default function IconeNav({ path, className = 'h-5 w-5 shrink-0' }: { pat
                     <rect x="13.5" y="13.5" width="7" height="7" rx="0.5" />
                 </>
             )}
+            {path === '/configuracoes' && (
+                <>
+                    <circle cx="12" cy="12" r="3" />
+                    <path d="M12 3.5v2.2M12 18.3v2.2M3.5 12h2.2M18.3 12h2.2M6.1 6.1l1.6 1.6M16.3 16.3l1.6 1.6M17.9 6.1l-1.6 1.6M7.7 16.3l-1.6 1.6" />
+                </>
+            )}
             {path === '/estoque' && (
                 <>
                     <path d="M3.5 8 12 4.5 20.5 8 12 11.5z" />

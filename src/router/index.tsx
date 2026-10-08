@@ -6,8 +6,12 @@ import PedidosPage from '@/pages/Pedidos';
 import MesasPage from '@/pages/Mesas';
 import EstoqueGeralPage from '@/pages/EstoqueGeral';
 import EntradaEstoquePage from '@/pages/EntradaEstoque';
+import ConfiguracoesPage from '@/pages/configuracoes/Configuracoes';
+import AmbientesPage from '@/pages/configuracoes/Ambientes';
+import MesasCadastroPage from '@/pages/configuracoes/MesasCadastro';
+import EquipePage from '@/pages/configuracoes/Equipe';
 import ModuleProtectedRoute from './ModuleProtectedRoute';
-import { MODULOS_RAIZ, MODULO_ESTOQUE } from '@/constants/moduleCodes';
+import { CODIGOS_ENTRADA, MODULO_CONFIGURACOES, MODULO_ESTOQUE } from '@/constants/moduleCodes';
 
 const router = createBrowserRouter(
     [
@@ -16,7 +20,7 @@ const router = createBrowserRouter(
     {
         path: '/inicio',
         element: (
-            <ModuleProtectedRoute moduloCodigo={[...MODULOS_RAIZ]}>
+            <ModuleProtectedRoute moduloCodigo={CODIGOS_ENTRADA}>
                 <InicioPage />
             </ModuleProtectedRoute>
         ),
@@ -50,6 +54,38 @@ const router = createBrowserRouter(
         element: (
             <ModuleProtectedRoute moduloCodigo={MODULO_ESTOQUE}>
                 <EstoqueGeralPage />
+            </ModuleProtectedRoute>
+        ),
+    },
+    {
+        path: '/configuracoes',
+        element: (
+            <ModuleProtectedRoute moduloCodigo={MODULO_CONFIGURACOES}>
+                <ConfiguracoesPage />
+            </ModuleProtectedRoute>
+        ),
+    },
+    {
+        path: '/configuracoes/ambientes',
+        element: (
+            <ModuleProtectedRoute moduloCodigo={MODULO_CONFIGURACOES}>
+                <AmbientesPage />
+            </ModuleProtectedRoute>
+        ),
+    },
+    {
+        path: '/configuracoes/mesas',
+        element: (
+            <ModuleProtectedRoute moduloCodigo={MODULO_CONFIGURACOES}>
+                <MesasCadastroPage />
+            </ModuleProtectedRoute>
+        ),
+    },
+    {
+        path: '/configuracoes/equipe',
+        element: (
+            <ModuleProtectedRoute moduloCodigo={MODULO_CONFIGURACOES}>
+                <EquipePage />
             </ModuleProtectedRoute>
         ),
     },

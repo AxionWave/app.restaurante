@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { authService } from '@core/services';
 import { APP_CONFIG } from '@core/config';
-import { temModuloRaiz } from '@/constants/moduleCodes';
+import { temAcessoOrion } from '@/constants/moduleCodes';
 
 export default function LoginPage() {
     const navigate = useNavigate();
@@ -14,7 +14,7 @@ export default function LoginPage() {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        if (authService.isAuthenticated() && temModuloRaiz((c) => authService.hasModulo(c))) {
+        if (authService.isAuthenticated() && temAcessoOrion((c) => authService.hasModulo(c))) {
             navigate('/inicio', { replace: true });
             return;
         }
@@ -34,7 +34,7 @@ export default function LoginPage() {
                 authService.logout();
                 return;
             }
-            if (!temModuloRaiz((c) => authService.hasModulo(c))) {
+            if (!temAcessoOrion((c) => authService.hasModulo(c))) {
                 setError('Sua conta ainda não tem acesso a este restaurante. Peça a liberação no ASC e entre de novo.');
                 return;
             }
@@ -70,7 +70,7 @@ export default function LoginPage() {
                         A casa, em ordem.
                     </p>
                     <p className="mt-4 max-w-sm text-sm leading-relaxed text-ivory/55">
-                        Cardápio, salão, comandas e despensa — o serviço da casa num só lugar.
+                        Cardápio, mesas, comandas e despensa — o serviço da casa num só lugar.
                     </p>
                 </div>
                 <p className="relative text-[11px] uppercase tracking-[0.22em] text-ivory/35">{APP_CONFIG.descricao}</p>
