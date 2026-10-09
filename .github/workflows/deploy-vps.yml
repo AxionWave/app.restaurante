@@ -78,6 +78,11 @@ jobs:
             fi
             nginx -t
             systemctl reload nginx
-            code=$(curl -s -o /dev/null -w '%{http_code}' -k -H 'Host: enterprise.lumenemotion.com.br' https://127.0.0.1/orion/)
+            code=000
+            for i in 1 2 3 4 5 6; do
+              sleep 2
+              code=$(curl -s -o /dev/null -w '%{http_code}' -k -H 'Host: enterprise.lumenemotion.com.br' https://127.0.0.1/orion/)
+              if [ "$code" = "200" ]; then break; fi
+            done
             echo "GET /orion/ -> $code"
             [ "$code" = "200" ]
