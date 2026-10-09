@@ -3,6 +3,7 @@ import LoginPage from '@/pages/Login';
 import InicioPage from '@/pages/Inicio';
 import CardapioPage from '@/pages/Cardapio';
 import PedidosPage from '@/pages/Pedidos';
+import ComandaMesaPage from '@/pages/ComandaMesa';
 import MesasPage from '@/pages/Mesas';
 import EstoqueGeralPage from '@/pages/EstoqueGeral';
 import EntradaEstoquePage from '@/pages/EntradaEstoque';
@@ -38,6 +39,14 @@ const router = createBrowserRouter(
         element: (
             <ModuleProtectedRoute moduloCodigo="ORI0000002">
                 <PedidosPage />
+            </ModuleProtectedRoute>
+        ),
+    },
+    {
+        path: '/pedidos/mesa/:mesaId',
+        element: (
+            <ModuleProtectedRoute moduloCodigo={['ORI0000002', 'ORI0000003']}>
+                <ComandaMesaPage />
             </ModuleProtectedRoute>
         ),
     },

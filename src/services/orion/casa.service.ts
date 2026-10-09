@@ -1,3 +1,4 @@
+import { AxiosError } from 'axios';
 import { httpClient } from '@core/services/http.service';
 import { API_CONFIG } from '@core/config';
 
@@ -9,6 +10,7 @@ export type StatusAtendimento = 'Aberta' | 'Conta' | 'Fechada';
 export type DestinoPedido = 'Cozinha' | 'Bar' | 'Sobremesa';
 export type StatusItem = 'Lancado' | 'EmPreparo' | 'Pronto' | 'Entregue' | 'Cancelado';
 export type ModoFechamento = 'PorPessoa' | 'Dividido' | 'Anfitriao';
+export type ModoGrupoCobranca = 'Junto' | 'Separado';
 
 export interface Ambiente {
     id: number;
@@ -100,6 +102,12 @@ export interface ItemComanda {
     canceladoPorNome?: string | null;
 }
 
+export interface GrupoCobranca {
+    id: number;
+    modo: ModoGrupoCobranca;
+    lugarIds: number[];
+}
+
 export interface Atendimento {
     id: number;
     mesaId: number;
@@ -115,8 +123,43 @@ export interface Atendimento {
     mesasIds: number[];
     lugares: Lugar[];
     itens: ItemComanda[];
+    grupos: GrupoCobranca[];
     total: number;
     cotaIgual: number;
+}
+
+export interface ContaItem {
+    id: number;
+    descricao: string;
+    quantidade: number;
+    precoUnitario: number;
+    total: number;
+}
+
+export interface ContaPessoa {
+    lugarId: number;
+    ordem: number;
+    nome: string;
+    subtotal: number;
+    itens: ContaItem[];
+}
+
+export interface ContaGrupo {
+    id?: number | null;
+    modo: ModoGrupoCobranca;
+    lugarIds: number[];
+    titulo: string;
+    total: number;
+    pessoas: ContaPessoa[];
+}
+
+export interface Conta {
+    atendimentoId: number;
+    mesaId: number;
+    mesaRotulo: string;
+    total: number;
+    porPessoa: ContaPessoa[];
+    porGrupo: ContaGrupo[];
 }
 
 export const DESTINOS: { id: DestinoPedido; nome: string }[] = [
@@ -168,6 +211,18 @@ export const casaService = {
     mapa: () => get<MapaAmbiente[]>('/mapa'),
     abertos: () => get<Atendimento[]>('/atendimentos'),
     obter: (id: number) => get<Atendimento>(`/atendimentos/${id}`),
+    visitaDaMesa: async (mesaId: number) => {
+        try {
+            return await get<Atendimento>(`/mesas/${mesaId}/visita`);
+        } catch (erro) {
+            const status = (erro as AxiosError).response?.status;
+            if (status === 404) return null;
+            throw erro;
+        }
+    },
+    grupos: (id: number, grupos: { modo: ModoGrupoCobranca; lugarIds: number[] }[]) =>
+        send<Atendimento>('put', `/atendimentos/${id}/grupos`, { grupos }),
+    conta: (id: number) => get<Conta>(`/atendimentos/${id}/conta`),
     abrir: (mesaId: number) => send<Atendimento>('post', `/mesas/${mesaId}/abrir`),
     pedirConta: (id: number) => send<Atendimento>('post', `/atendimentos/${id}/conta`),
     reabrir: (id: number) => send<Atendimento>('post', `/atendimentos/${id}/reabrir`),
