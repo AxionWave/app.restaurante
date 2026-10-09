@@ -19,7 +19,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - run: npm ci
@@ -29,6 +29,7 @@ jobs:
         env:
           VITE_GATEWAY_AMBIENTE: homolog
           VITE_ORION_AMBIENTE: homolog
+          VITE_OAUTH_AMBIENTE: homolog
           VITE_BASE_PATH: /orion/
           VITE_APP_NOME_EMPRESA: Enterprise X
           VITE_APP_NOME_APP: Orion
@@ -41,10 +42,12 @@ jobs:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
+          passphrase: ${{ secrets.VPS_SSH_PASSPHRASE }}
           port: ${{ secrets.VPS_PORT }}
           source: "dist/*"
           target: /tmp/orion-dist
           strip_components: 1
+          rm: true
 
       - name: Publish on nginx
         uses: appleboy/ssh-action@v1.2.0
@@ -52,6 +55,7 @@ jobs:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
+          passphrase: ${{ secrets.VPS_SSH_PASSPHRASE }}
           port: ${{ secrets.VPS_PORT }}
           script_stop: true
           script: |
@@ -59,28 +63,22 @@ jobs:
             mkdir -p /var/www/enterprise-apps/orion
             rm -rf /var/www/enterprise-apps/orion/*
             cp -a /tmp/orion-dist/. /var/www/enterprise-apps/orion/
-            chown -R www-data:www-data /var/www/enterprise-apps
+            chown -R www-data:www-data /var/www/enterprise-apps/orion
+            mkdir -p /etc/nginx/snippets/enterprise-apps
+            printf '%s\n' \
+              'location = /orion { return 301 /orion/; }' \
+              'location ^~ /orion/ {' \
+              '    root /var/www/enterprise-apps;' \
+              '    index index.html;' \
+              '    try_files $uri $uri/ /orion/index.html;' \
+              '}' > /etc/nginx/snippets/enterprise-apps/orion.conf
             CONF=/etc/nginx/sites-available/enterprise.lumenemotion.com.br
-            if ! grep -q 'location /orion/' "$CONF"; then
-              python3 - <<'PY'
-            from pathlib import Path
-            path = Path('/etc/nginx/sites-available/enterprise.lumenemotion.com.br')
-            text = path.read_text()
-            snippet = '''
-                location /orion/ {
-                    root /var/www/enterprise-apps;
-                    try_files $uri $uri/ /orion/index.html;
-                }
-
-            '''
-            marker = '    location / {'
-            idx = text.find(marker)
-            if idx < 0:
-                raise SystemExit('marker not found in enterprise nginx conf')
-            path.write_text(text[:idx] + snippet + text[idx:])
-            print('Inserted /orion/ location')
-            PY
+            if ! grep -q 'snippets/enterprise-apps/' "$CONF"; then
+              echo "Falta 'include snippets/enterprise-apps/*.conf;' no bloco 443 de $CONF"
+              exit 1
             fi
             nginx -t
             systemctl reload nginx
-            curl -sI https://127.0.0.1/orion/ -H 'Host: enterprise.lumenemotion.com.br' -k | head -8
+            code=$(curl -s -o /dev/null -w '%{http_code}' -k -H 'Host: enterprise.lumenemotion.com.br' https://127.0.0.1/orion/)
+            echo "GET /orion/ -> $code"
+            [ "$code" = "200" ]
