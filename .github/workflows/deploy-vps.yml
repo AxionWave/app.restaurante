@@ -30,7 +30,7 @@ jobs:
           VITE_GATEWAY_AMBIENTE: homolog
           VITE_ORION_AMBIENTE: homolog
           VITE_OAUTH_AMBIENTE: homolog
-          VITE_BASE_PATH: /orion/
+          VITE_BASE_PATH: /
           VITE_APP_NOME_EMPRESA: Enterprise X
           VITE_APP_NOME_APP: Orion
           VITE_APP_SIGLA_SISTEMA: ORI
@@ -63,26 +63,15 @@ jobs:
             rm -rf /var/www/enterprise-apps/orion/*
             cp -a /tmp/orion-dist/. /var/www/enterprise-apps/orion/
             chown -R www-data:www-data /var/www/enterprise-apps/orion
-            mkdir -p /etc/nginx/snippets/enterprise-apps
-            printf '%s\n' \
-              'location = /orion { return 301 /orion/; }' \
-              'location ^~ /orion/ {' \
-              '    root /var/www/enterprise-apps;' \
-              '    index index.html;' \
-              '    try_files $uri $uri/ /orion/index.html;' \
-              '}' > /etc/nginx/snippets/enterprise-apps/orion.conf
-            CONF=/etc/nginx/sites-available/enterprise.lumenemotion.com.br
-            if ! grep -q 'snippets/enterprise-apps/' "$CONF"; then
-              echo "Falta 'include snippets/enterprise-apps/*.conf;' no bloco 443 de $CONF"
+            if [ ! -f /etc/nginx/sites-enabled/orion.lumensoft.com.br ]; then
+              echo "Falta o site nginx orion.lumensoft.com.br (server block + certificado) na VPS"
               exit 1
             fi
-            nginx -t
-            systemctl reload nginx
             code=000
             for i in 1 2 3 4 5 6; do
               sleep 2
-              code=$(curl -s -o /dev/null -w '%{http_code}' -k -H 'Host: enterprise.lumenemotion.com.br' https://127.0.0.1/orion/)
+              code=$(curl -s -o /dev/null -w '%{http_code}' --resolve orion.lumensoft.com.br:443:127.0.0.1 https://orion.lumensoft.com.br/)
               if [ "$code" = "200" ]; then break; fi
             done
-            echo "GET /orion/ -> $code"
+            echo "GET https://orion.lumensoft.com.br/ -> $code"
             [ "$code" = "200" ]

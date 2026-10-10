@@ -13,7 +13,7 @@ export type Ambiente = 'local' | 'homolog';
 
 export const GATEWAY_BY_AMBIENTE: Record<Ambiente, string> = {
     local: 'http://localhost:8080',
-    homolog: 'https://enterprise.lumenemotion.com.br',
+    homolog: 'https://api.lumensoft.com.br',
 };
 
 export function parseAmbiente(value: unknown): Ambiente | null {
@@ -58,7 +58,7 @@ export function resolveGatewayUrl(productAmbiente?: unknown): { url: string; amb
     return { url, ambiente };
 }
 
-/** Início do ASC (hub). VITE_ASC_AMBIENTE, senão localhost → :3000, senão /app/ na VPS. */
+/** Início do ASC (hub). VITE_ASC_AMBIENTE, senão localhost → :3000, senão hub.lumensoft.com.br. */
 export function urlInicioAsc(): string {
     const explicit = parseAmbiente(import.meta.env.VITE_ASC_AMBIENTE);
     const fromHost =
@@ -69,5 +69,5 @@ export function urlInicioAsc(): string {
     const ambiente: Ambiente = explicit || fromHost;
     return ambiente === 'local'
         ? 'http://localhost:3000/inicio'
-        : 'https://enterprise.lumenemotion.com.br/app/inicio';
+        : 'https://hub.lumensoft.com.br/inicio';
 }

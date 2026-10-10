@@ -28,7 +28,7 @@ O painel chama `GET /api/restaurante/me` no Gateway escolhido.
 
 ## CI/CD
 
-Push em `production` faz deploy na VPS (`https://enterprise.lumenemotion.com.br/orion/`).
+Push em `production` faz deploy na VPS (`https://orion.lumensoft.com.br/`).
 Secrets: os mesmos do Gateway (`VPS_*`) + `FRONTEND_SECRET_TOKEN`.
 
 ## Módulos
