@@ -31,7 +31,7 @@ jobs:
           VITE_ORION_AMBIENTE: homolog
           VITE_OAUTH_AMBIENTE: homolog
           VITE_BASE_PATH: /
-          VITE_APP_NOME_EMPRESA: Enterprise X
+          VITE_APP_NOME_EMPRESA: Axion Wave
           VITE_APP_NOME_APP: Orion
           VITE_APP_SIGLA_SISTEMA: ORI
           VITE_APP_SECRET_TOKEN_QR: ${{ secrets.FRONTEND_SECRET_TOKEN }}
